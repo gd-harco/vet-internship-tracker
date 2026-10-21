@@ -1,0 +1,41 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vet-tracker-v2
+    restart: unless-stopped
+    volumes:
+      - vet_data2:/data
+    environment:
+      - PORT=8080
+      - DB_PATH=/data/data.db
+      # Surcharger si besoin :
+      # - VET_API_TIMEOUT_SECONDS=20
+    networks:
+      - frontend
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=frontend
+      # réseau local : accès direct
+      - traefik.http.routers.vet-tracker-v2_local.entrypoints=websecure
+      - traefik.http.routers.vet-tracker-v2_local.rule=Host(`${VET_HOST}`) && (ClientIP(`192.168.0.0/16`) || ClientIP(`10.0.0.0/8`) || ClientIP(`172.16.0.0/12`))
+      - traefik.http.routers.vet-tracker-v2_local.priority=100
+      - traefik.http.routers.vet-tracker-v2_local.tls.certresolver=myResolver
+      # autres IP : mot de passe requis (hash htpasswd dans VET_BASICAUTH_USERS, voir .env)
+      - traefik.http.middlewares.vet-tracker-v2-auth.basicauth.users=${VET_BASICAUTH_USERS}
+      - traefik.http.routers.vet-tracker-v2_bureau.entrypoints=websecure
+      - traefik.http.routers.vet-tracker-v2_bureau.rule=Host(`${VET_HOST}`)
+      - traefik.http.routers.vet-tracker-v2_bureau.priority=10
+      - traefik.http.routers.vet-tracker-v2_bureau.tls.certresolver=myResolver
+      - traefik.http.routers.vet-tracker-v2_bureau.middlewares=vet-tracker-v2-auth
+      # port interne de l'app
+      - traefik.http.services.vet-tracker-v2.loadbalancer.server.port=8080
+
+networks:
+  frontend:
+    external: true
+
+volumes:
+  vet_data2:
+    driver: local

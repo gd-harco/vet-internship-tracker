@@ -1,0 +1,18 @@
+services:
+  app:
+    build: .
+    image: vet-tracker:dev
+    restart: unless-stopped
+    volumes:
+      - vet_data:/data
+    environment:
+      - PORT=8080
+      - DB_PATH=/data/data.db
+      # Surcharger si besoin :
+      # - VET_API_TIMEOUT_SECONDS=20
+    ports:
+      - "8080:8080"
+
+volumes:
+  vet_data:
+    driver: local

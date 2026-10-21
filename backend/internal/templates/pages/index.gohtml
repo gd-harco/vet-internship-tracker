@@ -1,0 +1,126 @@
+{{ define "index" }} {{ template "base" . }} {{ end }} {{ define "content" }}
+<header class="row header-row">
+  <div>
+    <h1>Vet-Tracker</h1>
+  </div>
+</header>
+
+<button
+  class="btn btn-primary"
+  type="button"
+  hx-get="/map"
+  hx-target="#main-content"
+  hx-swap="innerHTML"
+>
+  Vue Carte
+</button>
+
+<button
+  class="btn btn-primary"
+  type="button"
+  hx-get="/card"
+  hx-target="#main-content"
+  hx-swap="innerHTML"
+>
+  Vue par list
+</button>
+<button
+  class="btn btn-primary"
+  type="button"
+  onclick="document.getElementById('form-manualAdd').toggleAttribute('hidden')"
+>
+  + Ajouter une clinique manuellement
+</button>
+
+<section id="form-manualAdd" class="panel" hidden>
+  <h2>Ajouter une clinique manuellement</h2>
+  <form
+    class="stack"
+    hx-post="/clinics/manual"
+    hx-target="#clinics-list"
+    hx-swap="afterbegin"
+    hx-on::after-request="if(event.detail.successful) this.reset()"
+  >
+    <div class="row">
+      <input class="input" type="text" name="name" placeholder="Nom" required />
+      <input
+        class="input"
+        type="text"
+        name="city"
+        placeholder="Ville"
+        required
+      />
+    </div>
+    <div class="row">
+      <input
+        class="input"
+        type="text"
+        name="address_way"
+        placeholder="Adresse"
+      />
+      <input
+        class="input"
+        type="text"
+        name="zip_code"
+        placeholder="Code postal"
+      />
+    </div>
+    <div class="row">
+      <input class="input" type="text" name="phone" placeholder="Telephone" />
+      <button class="btn btn-primary" type="submit">Ajouter</button>
+    </div>
+  </form>
+</section>
+
+
+<section id="main-content">
+ {{ template "card_view" . }}
+</section>
+{{ end }}
+
+{{ define "card_view"}}
+<div class="row" id="status-filters">
+  <button class="btn filter-btn filter-btn-active" onclick="filterClinics(this, '')">Toutes</button>
+  <button class="btn filter-btn" onclick="filterClinics(this, 'not_contacted')">Nouveau</button>
+  <button class="btn filter-btn" onclick="filterClinics(this, 'to_send')">Candidature prête, à envoyer</button>
+  <button class="btn filter-btn" onclick="filterClinics(this, 'contacted')">CV déposé</button>
+  <button class="btn filter-btn" onclick="filterClinics(this, 'to_follow_up')">Mail de relance envoyé</button>
+  <button class="btn filter-btn" onclick="filterClinics(this, 'refused')">Refusé</button>
+  <button class="btn filter-btn" onclick="filterClinics(this, 'accepted')">Accepté</button>
+</div>
+<script>
+  var activeFilters = new Set();
+  function filterClinics(btn, status) {
+    var allBtn = document.querySelector('#status-filters .filter-btn');
+    if (status === '') {
+      activeFilters.clear();
+      document.querySelectorAll('#status-filters .filter-btn').forEach(function(b) {
+        b.classList.remove('filter-btn-active');
+      });
+      allBtn.classList.add('filter-btn-active');
+    } else {
+      if (activeFilters.has(status)) {
+        activeFilters.delete(status);
+        btn.classList.remove('filter-btn-active');
+      } else {
+        activeFilters.add(status);
+        btn.classList.add('filter-btn-active');
+      }
+      allBtn.classList.toggle('filter-btn-active', activeFilters.size === 0);
+    }
+    applyFilter();
+  }
+  function applyFilter() {
+    document.querySelectorAll('#clinics-list .card').forEach(function(card) {
+      card.hidden = activeFilters.size > 0 && !activeFilters.has(card.dataset.status);
+    });
+  }
+  document.getElementById('clinics-list').addEventListener('htmx:afterSettle', applyFilter);
+</script>
+  <div id="clinics-list" class="grid">
+    {{ template "clinic_items" .ClinicAndNotes }}
+  </div>
+  {{ if .HasNext }}
+  <div id="infinite-sentinel">{{ template "infinite_sentinel" .NextPage }}</div>
+  {{ end }}
+{{ end }}

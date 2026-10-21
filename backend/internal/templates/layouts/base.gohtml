@@ -1,0 +1,37 @@
+{{ define "base" }}
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vet-tracker</title>
+    <script src="/static/htmx.min.js"></script>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <style>
+      :root {
+        --bg: #f5f7fa;
+        --surface: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --primary: #0f766e;
+        --border: #e5e7eb;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top right, #d8f3dc, var(--bg));
+        color: var(--text);
+      }
+    </style>
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+  </head>
+  <body>
+    <main class="container">{{ template "content" . }}</main>
+  </body>
+</html>
+{{ end }}

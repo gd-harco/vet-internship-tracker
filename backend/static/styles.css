@@ -1,0 +1,313 @@
+/* ===== Layout Styles ==== */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* ===== Header Styles ==== */
+.header-row {
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.header-row h1 {
+  margin: 0;
+}
+
+/* ===== Button Styles ==== */
+.btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* ===== Panel Styles ==== */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== Grid Styles ==== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+/* ===== Card Styles ==== */
+.card {
+  padding: 14px;
+}
+
+/* ===== Form Styles ==== */
+.input,
+select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+/* ===== Text Styles ==== */
+.muted {
+  color: var(--muted);
+}
+
+.card-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.field-line {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* ===== Badge Styles ==== */
+.badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ===== Notes Styles ==== */
+.notes {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.note {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
+/* ===== Status Select ==== */
+.status-select {
+  margin-top: 10px;
+}
+
+/* ===== Filter Buttons ==== */
+.filter-btn {
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 13px;
+  padding: 6px 14px;
+}
+
+.filter-btn-active {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ===== Filter Container ==== */
+#status-filters {
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* ===== Manual Add Form ==== */
+#form-manualAdd {
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+#form-manualAdd h2 {
+  margin: 0 0 10px;
+}
+
+/* ===== Clinic Card Specific ==== */
+#clinic-info-row {
+  align-items: center;
+  gap: 8px;
+}
+
+#clinic-info-row h3 {
+  margin: 0;
+}
+
+.edit-btn {
+  padding: 2px 6px;
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.clinic-info-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-row {
+  gap: 8px;
+}
+
+.form-flex-1 {
+  flex: 1;
+}
+
+.form-flex-0 {
+  flex: 0 0 120px;
+}
+
+.form-label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.form-input {
+  width: 100%;
+}
+
+.form-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+.form-actions {
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.cancel-btn {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.clinic-header {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.status-badge-container {
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.hide-btn {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.hide-btn-container {
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.notes-count {
+  margin-top: 10px;
+}
+
+.notes-form {
+  margin-top: 8px;
+}
+
+/* ===== Note Item ==== */
+.note-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.note-content span {
+  margin-right: 8px;
+}
+
+.delete-note-btn {
+  padding: 2px 8px;
+  font-size: 12px;
+  background: #fee2e2;
+  color: #991b1b;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+/* ===== Status Badge Colors ==== */
+.status-not-contacted {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.status-contacted {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-to-follow-up {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-refused {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-no-reply {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.status-send-mail {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+/* ===== Infinite Sentinel ==== */
+#infinite-sentinel {
+  text-align: center;
+  padding: 20px;
+  color: var(--muted);
+}
+
+/* ===== Responsive ==== */
+@media (max-width: 640px) {
+  .container {
+    padding: 14px;
+  }
+}

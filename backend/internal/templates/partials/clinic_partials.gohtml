@@ -1,0 +1,132 @@
+{{ define "clinic_items" }}
+{{ range . }}
+{{ template "clinic_card" . }}
+{{ end }}
+{{ end }}
+
+{{ define "clinic_page_chunk" }}
+{{ template "clinic_items" .ClinicAndNotes }}
+{{ if .HasNext }}
+<div id="infinite-sentinel" hx-swap-oob="outerHTML">
+  {{ template "infinite_sentinel" .NextPage }}
+</div>
+{{ else }}
+<div id="infinite-sentinel" hx-swap-oob="outerHTML"></div>
+{{ end }}
+{{ end }}
+
+{{ define "infinite_sentinel" }}
+<div hx-get="/partials/clinics?page={{ . }}" hx-trigger="revealed" hx-target="#clinics-list" hx-swap="beforeend">
+  Chargement de la page {{ . }}...
+</div>
+{{ end }}
+
+{{ define "clinic_card_info" }}
+<div id="clinic-info-{{ .ID }}">
+  <div class="row" id="clinic-info-row">
+    <h3 class="card-title">{{ .Name }}</h3>
+    <button class="btn edit-btn" title="Modifier" hx-get="/clinics/{{ .ID }}/edit" hx-target="#clinic-info-{{ .ID }}"
+      hx-swap="outerHTML">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+        <path
+          d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
+      </svg>
+    </button>
+  </div>
+  <p class="field-line">{{ .AddressWay.String }}{{ if .ZipCode.Valid }} {{ .ZipCode.String }}{{ end }} {{ .City.String
+    }}</p>
+  {{ if .Phone.Valid }}<p class="field-line">Tel: {{ .Phone.String }}</p>{{ end }}
+  <p class="field-line">Source: {{ .Source }}</p>
+</div>
+{{ end }}
+
+{{ define "clinic_card_edit_form" }}
+<div id="clinic-info-{{ .Clinic.ID }}">
+  <form hx-put="/clinics/{{ .Clinic.ID }}" hx-target="#clinic-info-{{ .Clinic.ID }}" hx-swap="outerHTML"
+    class="clinic-info-form">
+    <div class="row form-row">
+      <div class="form-flex-1">
+        <label class="form-label">Nom *</label>
+        <input class="input form-input" type="text" name="name" value="{{ .Clinic.Name }}" required />
+      </div>
+      <div class="form-flex-1">
+        <label class="form-label">Téléphone</label>
+        <input class="input form-input" type="text" name="phone" value="{{ .Clinic.Phone.String }}" />
+      </div>
+    </div>
+    <div>
+      <label class="form-label">Adresse</label>
+      <input class="input form-input" type="text" name="address_way" value="{{ .Clinic.AddressWay.String }}" />
+    </div>
+    <div class="row form-row">
+      <div class="form-flex-0">
+        <label class="form-label">Code postal</label>
+        <input class="input form-input" type="text" name="zip_code" value="{{ .Clinic.ZipCode.String }}" />
+      </div>
+      <div class="form-flex-1">
+        <label class="form-label">Ville *</label>
+        <input class="input form-input" type="text" name="city" value="{{ .Clinic.City.String }}" required />
+      </div>
+    </div>
+    {{ if .ErrorMessage }}
+    <p role="alert" class="form-error">{{ .ErrorMessage }}</p>
+    {{ end }}
+    <div class="row form-actions">
+      <button type="button" class="btn cancel-btn" hx-get="/clinics/{{ .Clinic.ID }}/view"
+        hx-target="#clinic-info-{{ .Clinic.ID }}" hx-swap="outerHTML">Annuler</button>
+      <button type="submit" class="btn btn-secondary">Enregistrer</button>
+    </div>
+  </form>
+</div>
+{{ end }}
+
+{{ define "clinic_card" }}
+<article class="panel card" id="clinic-{{ .ID }}" data-status="{{ .TrackStatus }}">
+  <div class="row clinic-header">
+    {{ template "clinic_card_info" . }}
+  </div>
+
+  <div class="status-select">
+    <select name="status" hx-post="/clinics/{{ .ID }}/status" hx-swap="none"
+      hx-on::after-request="if(event.detail.successful) this.closest('.card').dataset.status = this.value">
+      <option value="not_contacted" {{ if eq .TrackStatus "not_contacted" }}selected{{ end }}>Nouveau</option>
+      <option value="to_send" {{ if eq .TrackStatus "to_send" }}selected{{ end }}>Candidature prête, à envoyer</option>
+      <option value="contacted" {{ if eq .TrackStatus "contacted" }}selected{{ end }}>CV déposé</option>
+      <option value="to_follow_up" {{ if eq .TrackStatus "to_follow_up" }}selected{{ end }}>Mail de relance envoyé</option>
+      <option value="refused" {{ if eq .TrackStatus "refused" }}selected{{ end }}>Refusé</option>
+      <option value="accepted" {{ if eq .TrackStatus "accepted" }}selected{{ end }}>Accepté</option>
+    </select>
+  </div>
+  <div class="row hide-btn-container">
+    <button class="btn hide-btn" hx-post="/clinics/{{ .ID }}/hide" hx-target="#clinic-{{ .ID }}" hx-swap="outerHTML"
+      hx-confirm="Masquer cette clinique ?">Masquer la clinique</button>
+  </div>
+
+  <p class="field-line notes-count" id="notes-count-{{ .ID }}">Notes ({{ len .Notes }})</p>
+  <ul class="notes" id="notes-list-{{ .ID }}">
+    {{ range .Notes }}
+    {{ template "note_item" . }}
+    {{ end }}
+  </ul>
+
+  <form class="row notes-form" hx-post="/clinics/{{ .ID }}/notes" hx-target="#notes-list-{{ .ID }}" hx-swap="afterbegin"
+    hx-on::after-request="if(event.detail.successful) this.reset()">
+    <input class="input" type="text" name="content" placeholder="Ajouter une note" required />
+    <button class="btn btn-secondary" type="submit">Ajouter</button>
+  </form>
+</article>
+{{ end }}
+
+{{ define "note_item" }}
+<li class="note note-item" id="note-{{ .ID }}">
+  <span><span class="muted">{{ .CreatedAt.Format "02/01/2006" }}</span> {{ .Content }}</span>
+  <button class="btn delete-note-btn" hx-delete="/clinics/{{ .ClinicID }}/notes/{{ .ID }}" hx-target="#note-{{ .ID }}"
+    hx-swap="outerHTML" hx-confirm="Supprimer cette note ?">✕</button>
+</li>
+{{ end }}
+
+{{ define "notes_count_oob" }}
+<p class="field-line notes-count" id="notes-count-{{ .ClinicID }}" hx-swap-oob="true">Notes ({{ .Count }})</p>
+{{ end }}

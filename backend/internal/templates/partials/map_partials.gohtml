@@ -1,0 +1,75 @@
+{{ define "map" }}
+<div id="map" style="height: 70vh"></div>
+<script>
+(function () {
+    const el = document.getElementById('map');
+    const map = L.map(el).setView([45.79, 4.8], 13);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    el.addEventListener('htmx:beforeCleanupElement', (evt) => {
+        if (evt.target === el) {
+            document.removeEventListener('htmx:afterRequest', onAfterRequest);
+            map.remove();
+        }
+    });
+
+    const STATUS_COLORS = {
+        not_contacted: '#6b7280',
+        to_send: '#ff7300',
+        contacted: '#2563eb',
+        to_follow_up: '#c9ab8a',
+        refused: '#dc2626',
+        accepted: '#16a34a',
+    };
+
+    const statusIcon = (status) => L.divIcon({
+        className: '',
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
+        popupAnchor: [0, -11],
+        html: `<div style="width:22px;height:22px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 4px rgba(0,0,0,.5);background:${STATUS_COLORS[status] ?? STATUS_COLORS.not_contacted}"></div>`,
+    });
+
+    const markerById = new Map();
+
+    // Réagit aux changements de statut / masquage faits depuis le popup.
+    function onAfterRequest(evt) {
+        const { successful, requestConfig, elt } = evt.detail;
+        if (!successful || requestConfig.verb !== 'post') return;
+        const m = requestConfig.path.match(/^\/clinics\/(\d+)\/(status|hide)$/);
+        if (!m) return;
+        const id = Number(m[1]);
+        const marker = markerById.get(id);
+        if (!marker) return;
+        if (m[2] === 'status') {
+            marker.setIcon(statusIcon(elt.value));
+        } else {
+            marker.remove();
+            markerById.delete(id);
+        }
+    }
+    document.addEventListener('htmx:afterRequest', onAfterRequest);
+
+    const markers = {{ .Markers }} ?? [];
+
+    markers.forEach(current => {
+        const marker = L.marker([current.lat, current.lng], { icon: statusIcon(current.track_status) }).addTo(map);
+        markerById.set(current.id, marker);
+        marker.bindPopup('Chargement…', { minWidth: 220 });
+
+        marker.on('popupopen', () => {
+            const container = document.createElement('div');
+            container.textContent = 'Chargement…';
+            marker.getPopup().setContent(container);
+            htmx.ajax('GET', `/clinics/${current.id}/card`, { target: container, swap: 'innerHTML' })
+                .then(() => marker.getPopup().update())
+                .catch(() => { container.textContent = 'Impossible de charger les infos.'; });
+        });
+    });
+})();
+</script>
+{{ end }}

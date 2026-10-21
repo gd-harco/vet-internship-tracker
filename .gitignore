@@ -1,0 +1,17 @@
+# Binaires et bases de donnees locales
+*.exe
+*.db
+*.db-shm
+*.db-wal
+*.log
+backend/bin/
+backend/vet-tracker
+Data/
+
+# Variables d'environnement locales
+.env
+
+# Editeur / OS
+.vscode/
+.idea/
+.DS_Store

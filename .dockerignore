@@ -1,0 +1,13 @@
+# Binaires et bases de données locales
+backend/main.exe
+backend/data.db
+backend/cmd/server/data.db
+
+# Fichiers de développement
+backend/bin/
+.git
+.github
+docker-compose.dev.yml
+
+# Variables d'environnement locales
+.env
